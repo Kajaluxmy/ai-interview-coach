@@ -102,8 +102,16 @@ const logout = (req, res) => {
   });
 };
 
+const getMe = async (req, res) => {
+  res.status(200).json({
+    success: true,
+    user: req.user,
+  });
+};
+
 module.exports = {
   register,
   login,
   logout,
+  getMe,
 };
