@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -18,13 +20,17 @@ app.use(
 
 app.use(express.json());
 
+app.use(cookieParser());
+
+connectDB();
+
 app.get("/", (req, res) => {
   res.json({
     message: "AI Interview Coach API is running",
   });
 });
 
-connectDB();
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 
