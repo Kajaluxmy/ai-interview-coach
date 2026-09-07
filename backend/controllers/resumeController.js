@@ -1,7 +1,11 @@
 const fs = require("fs");
 const path = require("path");
+const {
+  extractTextFromPDF,
+} = require("../utils/resumeParser");
 
 const resumeService = require("../services/resumeService");
+
 
 const uploadResume = async (req, res) => {
   try {
@@ -12,19 +16,23 @@ const uploadResume = async (req, res) => {
       });
     }
 
-    const resume = await resumeService.createResume(
-      req.user._id,
-      {
-        fileName: req.file.originalname,
-        fileUrl: `/uploads/resumes/${req.file.filename}`,
-        fileType: req.file.mimetype,
-        extractedText: "",
-      }
-    );
+    const extractedText =
+      await extractTextFromPDF(req.file.path);
+
+    const resume =
+      await resumeService.createResume(
+        req.user._id,
+        {
+          fileName: req.file.originalname,
+          fileUrl: `/uploads/resumes/${req.file.filename}`,
+          fileType: req.file.mimetype,
+          extractedText,
+        }
+      );
 
     res.status(201).json({
       success: true,
-      message: "Resume uploaded successfully",
+      message: "Resume uploaded and processed successfully",
       resume,
     });
   } catch (error) {
