@@ -28,8 +28,9 @@ app.use(cookieParser());
 connectDB();
 
 app.get("/", (req, res) => {
-  res.json({
-    message: "AI Interview Coach API is running",
+  res.status(200).json({
+    success: true,
+    message: "AI Resume Analyzer API is running",
   });
 });
 
