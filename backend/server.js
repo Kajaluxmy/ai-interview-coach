@@ -10,6 +10,7 @@ const interviewRoutes = require("./routes/interviewRoutes");
 const questionRoutes = require("./routes/questionRoutes");
 const answerRoutes = require("./routes/answerRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
+const resumeAnalysisRoutes = require("./routes/resumeAnalysisRoutes");
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/interviews", interviewRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/answers", answerRoutes);
 app.use("/api/resumes", resumeRoutes);
+app.use("/api/resume-analysis",resumeAnalysisRoutes);
 
 const PORT = process.env.PORT || 5000;
 
