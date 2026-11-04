@@ -119,6 +119,34 @@ const startInterview = async (req, res) => {
   }
 };
 
+const completeInterview = async (req, res) => {
+  try {
+    const interview =
+      await interviewService.completeInterview(
+        req.params.id,
+        req.user._id
+      );
+
+    if (!interview) {
+      return res.status(404).json({
+        success: false,
+        message: "Interview not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Interview completed",
+      interview,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const deleteInterview = async (req, res) => {
   try {
     const interview =
@@ -151,5 +179,6 @@ module.exports = {
   getInterviews,
   getInterview,
   startInterview,
+  completeInterview,
   deleteInterview,
 };

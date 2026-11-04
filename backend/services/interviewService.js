@@ -43,6 +43,24 @@ const startInterview = async (interviewId, userId) => {
   return interview;
 };
 
+const completeInterview = async (interviewId, userId) => {
+  const interview = await Interview.findOneAndUpdate(
+    {
+      _id: interviewId,
+      userId,
+    },
+    {
+      status: "completed",
+      completedAt: new Date(),
+    },
+    {
+      new: true,
+    }
+  );
+
+  return interview;
+};
+
 const deleteInterview = async (interviewId, userId) => {
   return await Interview.findOneAndDelete({
     _id: interviewId,
@@ -55,5 +73,6 @@ module.exports = {
   getUserInterviews,
   getInterviewById,
   startInterview,
+  completeInterview,
   deleteInterview,
 };

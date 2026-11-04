@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
@@ -25,6 +26,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 connectDB();
 
@@ -40,7 +42,7 @@ app.use("/api/interviews", interviewRoutes);
 app.use("/api/questions", questionRoutes);
 app.use("/api/answers", answerRoutes);
 app.use("/api/resumes", resumeRoutes);
-app.use("/api/resume-analysis",resumeAnalysisRoutes);
+app.use("/api/resume-analysis", resumeAnalysisRoutes);
 
 const PORT = process.env.PORT || 5000;
 

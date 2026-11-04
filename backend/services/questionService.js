@@ -23,10 +23,7 @@ const createQuestion = async (userId, interviewId, data) => {
   return question;
 };
 
-const getQuestionsByInterview = async (
-  userId,
-  interviewId
-) => {
+const getQuestionsByInterview = async (userId, interviewId) => {
   const interview = await Interview.findOne({
     _id: interviewId,
     userId,
@@ -41,7 +38,60 @@ const getQuestionsByInterview = async (
   });
 };
 
+const getQuestionById = async (userId, questionId) => {
+  const question = await Question.findById(questionId).populate("interviewId");
+
+  if (!question) {
+    throw new Error("Question not found");
+  }
+
+  if (question.interviewId.userId.toString() !== userId.toString()) {
+    throw new Error("Unauthorized access");
+  }
+
+  return question;
+};
+
+const updateQuestion = async (userId, questionId, data) => {
+  const question = await Question.findById(questionId).populate("interviewId");
+
+  if (!question) {
+    throw new Error("Question not found");
+  }
+
+  if (question.interviewId.userId.toString() !== userId.toString()) {
+    throw new Error("Unauthorized access");
+  }
+
+  if (data.questionText !== undefined) question.questionText = data.questionText;
+  if (data.questionType !== undefined) question.questionType = data.questionType;
+  if (data.difficulty !== undefined) question.difficulty = data.difficulty;
+  if (data.questionNumber !== undefined) question.questionNumber = data.questionNumber;
+  if (data.expectedTopics !== undefined) question.expectedTopics = data.expectedTopics;
+
+  await question.save();
+  return question;
+};
+
+const deleteQuestion = async (userId, questionId) => {
+  const question = await Question.findById(questionId).populate("interviewId");
+
+  if (!question) {
+    throw new Error("Question not found");
+  }
+
+  if (question.interviewId.userId.toString() !== userId.toString()) {
+    throw new Error("Unauthorized access");
+  }
+
+  await Question.findByIdAndDelete(questionId);
+  return question;
+};
+
 module.exports = {
   createQuestion,
   getQuestionsByInterview,
+  getQuestionById,
+  updateQuestion,
+  deleteQuestion,
 };

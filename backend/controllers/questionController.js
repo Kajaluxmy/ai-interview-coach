@@ -78,7 +78,81 @@ const getQuestions = async (req, res) => {
   }
 };
 
+const getQuestion = async (req, res) => {
+  try {
+    const question = await questionService.getQuestionById(
+      req.user._id,
+      req.params.id
+    );
+
+    res.status(200).json({
+      success: true,
+      question,
+    });
+  } catch (error) {
+    let statusCode = 500;
+    if (error.message === "Question not found") statusCode = 404;
+    if (error.message === "Unauthorized access") statusCode = 403;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateQuestion = async (req, res) => {
+  try {
+    const question = await questionService.updateQuestion(
+      req.user._id,
+      req.params.id,
+      req.body
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Question updated successfully",
+      question,
+    });
+  } catch (error) {
+    let statusCode = 500;
+    if (error.message === "Question not found") statusCode = 404;
+    if (error.message === "Unauthorized access") statusCode = 403;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const deleteQuestion = async (req, res) => {
+  try {
+    await questionService.deleteQuestion(
+      req.user._id,
+      req.params.id
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Question deleted successfully",
+    });
+  } catch (error) {
+    let statusCode = 500;
+    if (error.message === "Question not found") statusCode = 404;
+    if (error.message === "Unauthorized access") statusCode = 403;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createQuestion,
   getQuestions,
+  getQuestion,
+  updateQuestion,
+  deleteQuestion,
 };
