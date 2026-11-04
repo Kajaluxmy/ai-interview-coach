@@ -15,6 +15,7 @@ const resumeAnalysisRoutes = require("./routes/resumeAnalysisRoutes");
 const evaluationRoutes = require("./routes/evaluationRoutes");
 const interviewReportRoutes = require("./routes/interviewReportRoutes");
 const jobDescriptionRoutes = require("./routes/jobDescriptionRoutes");
+const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 const app = express();
 
@@ -49,6 +50,9 @@ app.use("/api/resume-analysis", resumeAnalysisRoutes);
 app.use("/api/evaluations", evaluationRoutes);
 app.use("/api/reports", interviewReportRoutes);
 app.use("/api/job-descriptions", jobDescriptionRoutes);
+
+app.use(notFound);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
