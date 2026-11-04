@@ -4,6 +4,8 @@
  * and includes an intelligent fallback generator so the system works out-of-the-box.
  */
 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+
 const roleQuestionsBank = {
   default: [
     {
@@ -113,7 +115,7 @@ Generate ${count} tailored interview questions for:
 - Difficulty Level: ${interview.difficulty}
 ${resumeText ? `- Candidate Resume Summary: ${resumeText.substring(0, 1000)}` : ""}
 
-Return ONLY a valid JSON array of objects with no markdown code blocks, conforming to this exact schema:
+Return ONLY a valid JSON array of objects with no markdown formatting or markdown code blocks:
 [
   {
     "questionText": "string",
@@ -123,7 +125,7 @@ Return ONLY a valid JSON array of objects with no markdown code blocks, conformi
   }
 ]`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
     method: "POST",
@@ -224,7 +226,7 @@ Return ONLY a valid JSON object matching this schema:
   "improvements": ["actionable improvement 1", "actionable improvement 2"]
 }`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
   const response = await fetch(url, {
     method: "POST",
