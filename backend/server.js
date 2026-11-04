@@ -12,6 +12,7 @@ const questionRoutes = require("./routes/questionRoutes");
 const answerRoutes = require("./routes/answerRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const resumeAnalysisRoutes = require("./routes/resumeAnalysisRoutes");
+const evaluationRoutes = require("./routes/evaluationRoutes");
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use("/api/questions", questionRoutes);
 app.use("/api/answers", answerRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/resume-analysis", resumeAnalysisRoutes);
+app.use("/api/evaluations", evaluationRoutes);
 
 const PORT = process.env.PORT || 5000;
 
