@@ -14,6 +14,7 @@ const resumeRoutes = require("./routes/resumeRoutes");
 const resumeAnalysisRoutes = require("./routes/resumeAnalysisRoutes");
 const evaluationRoutes = require("./routes/evaluationRoutes");
 const interviewReportRoutes = require("./routes/interviewReportRoutes");
+const jobDescriptionRoutes = require("./routes/jobDescriptionRoutes");
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use("/api/resumes", resumeRoutes);
 app.use("/api/resume-analysis", resumeAnalysisRoutes);
 app.use("/api/evaluations", evaluationRoutes);
 app.use("/api/reports", interviewReportRoutes);
+app.use("/api/job-descriptions", jobDescriptionRoutes);
 
 const PORT = process.env.PORT || 5000;
 
