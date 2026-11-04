@@ -2,6 +2,7 @@ const Evaluation = require("../models/Evaluation");
 const Answer = require("../models/Answer");
 const Interview = require("../models/Interview");
 const Question = require("../models/Question");
+const aiService = require("./aiService");
 
 // Intelligent rule-based evaluator that scores answers and provides structured feedback
 const generateEvaluationData = (answerText, question) => {
@@ -146,16 +147,31 @@ const autoEvaluateAnswer = async (userId, answerId) => {
     throw new Error("Unauthorized access");
   }
 
-  const generated = generateEvaluationData(
-    answer.answerText,
-    answer.questionId
-  );
+  // Attempt evaluation using Gemini if available
+  let evaluationData = null;
+  try {
+    evaluationData = await aiService.evaluateAnswerWithGemini(
+      answer.questionId?.questionText || "",
+      answer.answerText || "",
+      answer.questionId?.expectedTopics || []
+    );
+  } catch (err) {
+    console.warn("AI evaluation error, fallback to heuristics:", err.message);
+  }
+
+  // Fallback to heuristic evaluation
+  if (!evaluationData) {
+    evaluationData = generateEvaluationData(
+      answer.answerText,
+      answer.questionId
+    );
+  }
 
   const evaluation = await Evaluation.findOneAndUpdate(
     { answerId },
     {
       answerId,
-      ...generated,
+      ...evaluationData,
     },
     { new: true, upsert: true }
   );

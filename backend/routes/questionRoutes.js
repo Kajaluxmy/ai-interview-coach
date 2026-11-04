@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   createQuestion,
+  generateQuestions,
   getQuestions,
   getQuestion,
   updateQuestion,
@@ -12,6 +13,7 @@ const protect = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+router.post("/:interviewId/generate", protect, generateQuestions);
 router.post("/:interviewId", protect, createQuestion);
 router.get("/:interviewId", protect, getQuestions);
 router.get("/single/:id", protect, getQuestion);

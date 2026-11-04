@@ -1,5 +1,7 @@
 const Question = require("../models/Question");
 const Interview = require("../models/Interview");
+const Resume = require("../models/Resume");
+const aiService = require("./aiService");
 
 const createQuestion = async (userId, interviewId, data) => {
   const interview = await Interview.findOne({
@@ -21,6 +23,52 @@ const createQuestion = async (userId, interviewId, data) => {
   });
 
   return question;
+};
+
+const generateQuestionsForInterview = async (
+  userId,
+  interviewId,
+  count,
+  resumeId = null
+) => {
+  const interview = await Interview.findOne({
+    _id: interviewId,
+    userId,
+  });
+
+  if (!interview) {
+    throw new Error("Interview not found");
+  }
+
+  let resumeText = "";
+  if (resumeId) {
+    const resume = await Resume.findOne({ _id: resumeId, userId });
+    if (resume) {
+      resumeText = resume.extractedText || "";
+    }
+  }
+
+  const generatedQuestionsData = await aiService.generateQuestions(
+    interview,
+    count || interview.totalQuestions,
+    resumeText
+  );
+
+  // Clear existing questions for this interview if re-generating
+  await Question.deleteMany({ interviewId });
+
+  const createdQuestions = await Question.insertMany(
+    generatedQuestionsData.map((q) => ({
+      interviewId,
+      questionText: q.questionText,
+      questionType: q.questionType,
+      difficulty: q.difficulty,
+      questionNumber: q.questionNumber,
+      expectedTopics: q.expectedTopics || [],
+    }))
+  );
+
+  return createdQuestions;
 };
 
 const getQuestionsByInterview = async (userId, interviewId) => {
@@ -90,6 +138,7 @@ const deleteQuestion = async (userId, questionId) => {
 
 module.exports = {
   createQuestion,
+  generateQuestionsForInterview,
   getQuestionsByInterview,
   getQuestionById,
   updateQuestion,

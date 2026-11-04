@@ -53,6 +53,37 @@ const createQuestion = async (req, res) => {
   }
 };
 
+const generateQuestions = async (req, res) => {
+  try {
+    const { count, resumeId } = req.body;
+
+    const questions =
+      await questionService.generateQuestionsForInterview(
+        req.user._id,
+        req.params.interviewId,
+        count,
+        resumeId
+      );
+
+    res.status(201).json({
+      success: true,
+      message: "Questions generated successfully",
+      count: questions.length,
+      questions,
+    });
+  } catch (error) {
+    const statusCode =
+      error.message === "Interview not found"
+        ? 404
+        : 500;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const getQuestions = async (req, res) => {
   try {
     const questions =
@@ -151,6 +182,7 @@ const deleteQuestion = async (req, res) => {
 
 module.exports = {
   createQuestion,
+  generateQuestions,
   getQuestions,
   getQuestion,
   updateQuestion,
