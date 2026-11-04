@@ -1,9 +1,9 @@
 const express = require("express");
 const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-require("dotenv").config();
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
