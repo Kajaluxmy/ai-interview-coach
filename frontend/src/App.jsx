@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Resumes from "./pages/Resumes";
+import ResumeAnalysis from "./pages/ResumeAnalysis";
 
 function AppRoutes() {
   const { user, logout } = useAuth();
@@ -36,6 +37,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Resumes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resume-analysis/:resumeId"
+          element={
+            <ProtectedRoute>
+              <ResumeAnalysis />
             </ProtectedRoute>
           }
         />
