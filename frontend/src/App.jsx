@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Resumes from "./pages/Resumes";
 import ResumeAnalysis from "./pages/ResumeAnalysis";
 import JobDescriptions from "./pages/JobDescriptions";
+import Interviews from "./pages/Interviews";
 
 function AppRoutes() {
   const { user, logout } = useAuth();
@@ -54,6 +55,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <JobDescriptions />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/interviews"
+          element={
+            <ProtectedRoute>
+              <Interviews />
             </ProtectedRoute>
           }
         />
