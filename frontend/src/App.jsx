@@ -1,11 +1,16 @@
-function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-4xl font-bold">
-        AI Interview Coach
-      </h1>
-    </div>
-  )
-}
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Layout user={null}>
+        <Routes>
+          <Route path="/" element={<Home user={null} />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
+  );
+}
