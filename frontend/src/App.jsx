@@ -11,6 +11,8 @@ import ResumeAnalysis from "./pages/ResumeAnalysis";
 import JobDescriptions from "./pages/JobDescriptions";
 import Interviews from "./pages/Interviews";
 import InterviewRoom from "./pages/InterviewRoom";
+import Reports from "./pages/Reports";
+import InterviewReport from "./pages/InterviewReport";
 
 function AppRoutes() {
   const { user, logout } = useAuth();
@@ -72,6 +74,22 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <InterviewRoom />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <Reports />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reports/:interviewId"
+          element={
+            <ProtectedRoute>
+              <InterviewReport />
             </ProtectedRoute>
           }
         />
