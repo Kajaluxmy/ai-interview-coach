@@ -18,6 +18,7 @@ import {
   Lightbulb,
 } from "lucide-react";
 import SpeechRecognitionButton from "../components/SpeechRecognitionButton";
+import StarMethodHelper from "../components/StarMethodHelper";
 
 export default function InterviewRoom() {
   const { id: interviewId } = useParams();
@@ -360,6 +361,16 @@ export default function InterviewRoom() {
                 <span>{wordCount} words</span>
               </div>
             </div>
+
+            {!existingAnswer && (
+              <StarMethodHelper
+                onApplyStructure={(structuredText) =>
+                  setAnswerText((prev) =>
+                    prev ? `${prev.trim()}\n\n${structuredText}` : structuredText
+                  )
+                }
+              />
+            )}
 
             <textarea
               rows={7}
