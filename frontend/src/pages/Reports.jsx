@@ -10,12 +10,18 @@ import {
   Loader2,
   AlertCircle,
   FileText,
+  Search,
+  Filter,
+  X,
+  RotateCcw,
 } from "lucide-react";
 
 export default function Reports() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -34,6 +40,19 @@ export default function Reports() {
 
     fetchReports();
   }, []);
+
+  const filteredReports = reports
+    .filter((report) => {
+      const role = report.interviewId?.jobRole || "";
+      return role.toLowerCase().includes(searchQuery.toLowerCase().trim());
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === "score_desc") return (b.overallScore || 0) - (a.overallScore || 0);
+      if (sortBy === "score_asc") return (a.overallScore || 0) - (b.overallScore || 0);
+      return 0;
+    });
 
   return (
     <div className="space-y-8">
@@ -82,8 +101,75 @@ export default function Reports() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {reports.map((report) => {
+        <div className="space-y-6">
+          {/* Search & Sort Controls */}
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="relative w-full sm:w-80">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search reports by job role..."
+                className="w-full pl-9 pr-8 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
+              <span className="text-xs text-slate-400 hidden sm:inline">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="score_desc">Highest Score</option>
+                <option value="score_asc">Lowest Score</option>
+              </select>
+
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-700/60 transition-colors"
+                  title="Clear search"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Results Grid or Empty Filter */}
+          {filteredReports.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-slate-900/40 border border-dashed border-slate-800 space-y-3">
+              <Filter className="w-8 h-8 text-slate-500 mx-auto" />
+              <h3 className="text-sm font-semibold text-white">
+                No matching reports found
+              </h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                No reports match your search query &quot;{searchQuery}&quot;.
+              </p>
+              <button
+                onClick={() => setSearchQuery("")}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-teal-400 hover:text-teal-300 bg-teal-500/10 hover:bg-teal-500/20 transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Clear Search</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredReports.map((report) => {
             const overall = report.overallScore || 0;
             const role = report.interviewId?.jobRole || "Mock Interview";
             const diff = report.interviewId?.difficulty || "intermediate";
@@ -157,6 +243,8 @@ export default function Reports() {
               </div>
             );
           })}
+            </div>
+          )}
         </div>
       )}
     </div>

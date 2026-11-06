@@ -16,6 +16,9 @@ import {
   FileText,
   Sliders,
   ArrowRight,
+  Search,
+  Filter,
+  RotateCcw,
 } from "lucide-react";
 
 export default function Interviews() {
@@ -27,12 +30,71 @@ export default function Interviews() {
 
   // Create Interview Modal State
   const [showModal, setShowModal] = useState(false);
-  const [jobRole, setJobRole] = useState("Full Stack Developer");
+  const [jobRole, setJobRole] = useState(
+    () => localStorage.getItem("ai_coach_pref_role") || "Full Stack Developer"
+  );
   const [interviewType, setInterviewType] = useState("technical");
-  const [difficulty, setDifficulty] = useState("intermediate");
+  const [difficulty, setDifficulty] = useState(
+    () =>
+      localStorage.getItem("ai_coach_pref_difficulty")?.toLowerCase() ||
+      "intermediate"
+  );
   const [totalQuestions, setTotalQuestions] = useState(5);
   const [selectedResumeId, setSelectedResumeId] = useState("");
   const [generating, setGenerating] = useState(false);
+
+  // Search & Filters State
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+
+  const filteredInterviews = interviews
+    .filter((item) => {
+      const matchesSearch = item.jobRole
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase().trim());
+      const matchesStatus =
+        statusFilter === "all" || item.status === statusFilter;
+      const matchesDifficulty =
+        difficultyFilter === "all" ||
+        item.difficulty?.toLowerCase() === difficultyFilter.toLowerCase();
+      const matchesType =
+        typeFilter === "all" ||
+        item.interviewType?.toLowerCase() === typeFilter.toLowerCase();
+      return matchesSearch && matchesStatus && matchesDifficulty && matchesType;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") return new Date(b.createdAt) - new Date(a.createdAt);
+      if (sortBy === "oldest") return new Date(a.createdAt) - new Date(b.createdAt);
+      if (sortBy === "role_asc") return (a.jobRole || "").localeCompare(b.jobRole || "");
+      return 0;
+    });
+
+  const counts = {
+    all: interviews.length,
+    completed: interviews.filter((i) => i.status === "completed").length,
+    in_progress: interviews.filter((i) => i.status === "in_progress").length,
+    not_started: interviews.filter(
+      (i) => i.status === "not_started" || !i.status
+    ).length,
+  };
+
+  const hasActiveFilters =
+    searchQuery.trim() !== "" ||
+    statusFilter !== "all" ||
+    difficultyFilter !== "all" ||
+    typeFilter !== "all" ||
+    sortBy !== "newest";
+
+  const resetFilters = () => {
+    setSearchQuery("");
+    setStatusFilter("all");
+    setDifficultyFilter("all");
+    setTypeFilter("all");
+    setSortBy("newest");
+  };
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -159,7 +221,7 @@ export default function Interviews() {
         </div>
       )}
 
-      {/* Interviews Grid */}
+      {/* Interviews Content */}
       {loading ? (
         <div className="p-8 text-center text-slate-400 text-sm flex items-center justify-center space-x-2">
           <Loader2 className="w-5 h-5 animate-spin text-indigo-400" />
@@ -187,8 +249,147 @@ export default function Interviews() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {interviews.map((interview) => {
+        <div className="space-y-6">
+          {/* Search & Filter Toolbar */}
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 space-y-4">
+            <div className="flex flex-col md:flex-row gap-3">
+              {/* Search input */}
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by job role (e.g. React, Backend, Data Engineer)..."
+                  className="w-full pl-9 pr-4 py-2 bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Multi-facet dropdown filters */}
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={difficultyFilter}
+                  onChange={(e) => setDifficultyFilter(e.target.value)}
+                  className="bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="all">All Difficulties</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="all">All Types</option>
+                  <option value="technical">Technical</option>
+                  <option value="behavioral">Behavioral</option>
+                  <option value="mixed">Mixed</option>
+                </select>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="bg-slate-800/80 border border-slate-700/80 rounded-xl text-xs text-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="role_asc">Role (A-Z)</option>
+                </select>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-700/60 transition-colors"
+                    title="Reset all filters"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Status Tabs */}
+            <div className="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+              <button
+                onClick={() => setStatusFilter("all")}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  statusFilter === "all"
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                All ({counts.all})
+              </button>
+              <button
+                onClick={() => setStatusFilter("completed")}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  statusFilter === "completed"
+                    ? "bg-teal-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                Completed ({counts.completed})
+              </button>
+              <button
+                onClick={() => setStatusFilter("in_progress")}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  statusFilter === "in_progress"
+                    ? "bg-amber-600 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                In Progress ({counts.in_progress})
+              </button>
+              <button
+                onClick={() => setStatusFilter("not_started")}
+                className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  statusFilter === "not_started"
+                    ? "bg-slate-700 text-white shadow-sm"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                Not Started ({counts.not_started})
+              </button>
+
+              <div className="ml-auto text-slate-500 text-[11px] font-mono hidden sm:block">
+                Showing {filteredInterviews.length} of {interviews.length}
+              </div>
+            </div>
+          </div>
+
+          {/* Filtered Grid or Empty Filter Result */}
+          {filteredInterviews.length === 0 ? (
+            <div className="p-12 text-center rounded-3xl bg-slate-900/40 border border-dashed border-slate-800 space-y-3">
+              <Filter className="w-8 h-8 text-slate-500 mx-auto" />
+              <h3 className="text-sm font-semibold text-white">
+                No matching interviews found
+              </h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                No interview sessions match the current search keyword or filters.
+              </p>
+              <button
+                onClick={resetFilters}
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset Filters</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredInterviews.map((interview) => {
             const isCompleted = interview.status === "completed";
             const inProgress = interview.status === "in_progress";
             const dateStr = new Date(interview.createdAt).toLocaleDateString(
@@ -284,6 +485,8 @@ export default function Interviews() {
               </div>
             );
           })}
+            </div>
+          )}
         </div>
       )}
 
