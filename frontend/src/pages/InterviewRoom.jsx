@@ -17,6 +17,7 @@ import {
   BarChart3,
   Lightbulb,
 } from "lucide-react";
+import SpeechRecognitionButton from "../components/SpeechRecognitionButton";
 
 export default function InterviewRoom() {
   const { id: interviewId } = useParams();
@@ -345,7 +346,19 @@ export default function InterviewRoom() {
               <span className="font-semibold text-slate-300">
                 {existingAnswer ? "Your Submitted Answer" : "Type Your Response"}
               </span>
-              <span>{wordCount} words</span>
+              <div className="flex items-center space-x-3">
+                {!existingAnswer && (
+                  <SpeechRecognitionButton
+                    onTranscript={(spokenText) =>
+                      setAnswerText((prev) =>
+                        prev ? `${prev.trim()} ${spokenText.trim()}` : spokenText.trim()
+                      )
+                    }
+                    disabled={submitting}
+                  />
+                )}
+                <span>{wordCount} words</span>
+              </div>
             </div>
 
             <textarea
