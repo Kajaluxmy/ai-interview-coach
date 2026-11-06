@@ -249,7 +249,49 @@ Return ONLY a valid JSON object matching this schema:
   return JSON.parse(textResponse);
 };
 
+/**
+ * Generate a progressive hint for a question
+ */
+const generateQuestionHint = async (questionText, expectedTopics = []) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (apiKey) {
+    try {
+      const prompt = `You are a supportive technical interviewer.
+The candidate is answering this question: "${questionText}".
+Expected key topics: ${JSON.stringify(expectedTopics)}.
+
+Provide a subtle, progressive hint (1-2 sentences) to unblock the candidate without giving away the direct answer.
+Start with: "Consider focusing on..." or "A good way to frame this is..."
+Return plain text only, no JSON, no formatting.`;
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.5 },
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const hint = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (hint) return hint;
+      }
+    } catch (err) {
+      console.warn("AI hint generation failed, fallback to heuristic:", err.message);
+    }
+  }
+
+  if (expectedTopics.length > 0) {
+    return `Consider discussing concepts around: ${expectedTopics.slice(0, 3).join(", ")}. Mention any trade-offs or personal experiences!`;
+  }
+  return "Think about the problem systematically: break it down into core requirements, your technical solution, and how you verify correctness.";
+};
+
 module.exports = {
   generateQuestions,
   evaluateAnswerWithGemini,
+  generateQuestionHint,
 };

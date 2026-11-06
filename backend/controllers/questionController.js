@@ -180,11 +180,41 @@ const deleteQuestion = async (req, res) => {
   }
 };
 
+const getHint = async (req, res) => {
+  try {
+    const question = await questionService.getQuestionById(
+      req.user._id,
+      req.params.id
+    );
+
+    const aiService = require("../services/aiService");
+    const hint = await aiService.generateQuestionHint(
+      question.questionText,
+      question.expectedTopics
+    );
+
+    res.status(200).json({
+      success: true,
+      hint,
+    });
+  } catch (error) {
+    let statusCode = 500;
+    if (error.message === "Question not found") statusCode = 404;
+    if (error.message === "Unauthorized access") statusCode = 403;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createQuestion,
   generateQuestions,
   getQuestions,
   getQuestion,
+  getHint,
   updateQuestion,
   deleteQuestion,
 };

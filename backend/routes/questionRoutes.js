@@ -5,6 +5,7 @@ const {
   generateQuestions,
   getQuestions,
   getQuestion,
+  getHint,
   updateQuestion,
   deleteQuestion,
 } = require("../controllers/questionController");
@@ -17,6 +18,7 @@ router.post("/:interviewId/generate", protect, generateQuestions);
 router.post("/:interviewId", protect, createQuestion);
 router.get("/:interviewId", protect, getQuestions);
 router.get("/single/:id", protect, getQuestion);
+router.get("/hint/:id", protect, getHint);
 router.put("/:id", protect, updateQuestion);
 router.delete("/:id", protect, deleteQuestion);
 

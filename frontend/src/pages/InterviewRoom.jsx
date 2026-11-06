@@ -30,6 +30,8 @@ export default function InterviewRoom() {
 
   const [answersMap, setAnswersMap] = useState({});
   const [evaluationsMap, setEvaluationsMap] = useState({});
+  const [hintsMap, setHintsMap] = useState({});
+  const [loadingHint, setLoadingHint] = useState(false);
 
   const [answerText, setAnswerText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -131,6 +133,21 @@ export default function InterviewRoom() {
       setAnswerText("");
     }
   }, [currentIndex, existingAnswer]);
+
+  const handleGetHint = async (questionId) => {
+    if (hintsMap[questionId]) return;
+    setLoadingHint(true);
+    try {
+      const res = await api.get(`/questions/hint/${questionId}`);
+      if (res.data?.success && res.data?.hint) {
+        setHintsMap((prev) => ({ ...prev, [questionId]: res.data.hint }));
+      }
+    } catch (err) {
+      console.warn("Could not fetch hint:", err);
+    } finally {
+      setLoadingHint(false);
+    }
+  };
 
   const handleSubmitAnswer = async (e) => {
     e.preventDefault();
@@ -315,14 +332,43 @@ export default function InterviewRoom() {
               <span className="font-bold uppercase tracking-wider text-indigo-400">
                 Question {currentIndex + 1} of {questions.length}
               </span>
-              <span className="capitalize px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
-                {currentQuestion.questionType}
-              </span>
+              <div className="flex items-center space-x-2">
+                {!existingAnswer && (
+                  <button
+                    type="button"
+                    onClick={() => handleGetHint(currentQuestion._id)}
+                    disabled={loadingHint || !!hintsMap[currentQuestion._id]}
+                    className="flex items-center space-x-1 px-2.5 py-1 rounded-xl text-xs font-semibold text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-colors disabled:opacity-70"
+                  >
+                    <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>
+                      {loadingHint
+                        ? "Consulting AI..."
+                        : hintsMap[currentQuestion._id]
+                        ? "Hint Visible"
+                        : "Need a Hint?"}
+                    </span>
+                  </button>
+                )}
+                <span className="capitalize px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium">
+                  {currentQuestion.questionType}
+                </span>
+              </div>
             </div>
 
             <h3 className="text-lg sm:text-xl font-bold text-white leading-relaxed">
               {currentQuestion.questionText}
             </h3>
+
+            {hintsMap[currentQuestion._id] && (
+              <div className="p-3.5 rounded-2xl bg-amber-950/30 border border-amber-500/20 text-xs text-amber-200 flex items-start gap-2.5">
+                <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <span className="font-bold text-amber-300">Coach Guidance Hint: </span>
+                  <span className="text-slate-200">{hintsMap[currentQuestion._id]}</span>
+                </div>
+              </div>
+            )}
 
             {currentQuestion.expectedTopics?.length > 0 && (
               <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
