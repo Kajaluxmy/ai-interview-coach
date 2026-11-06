@@ -74,14 +74,21 @@ export default function Navbar({ user, onLogout }) {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700/60">
-                  <div className="w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold uppercase">
+                <Link
+                  to="/profile"
+                  title="Profile & Settings"
+                  className="flex items-center space-x-2 bg-slate-800/80 hover:bg-slate-700/80 px-3 py-1.5 rounded-full border border-slate-700/60 hover:border-indigo-500/50 transition-all group"
+                >
+                  <div className="w-7 h-7 rounded-full bg-indigo-500 group-hover:bg-indigo-400 flex items-center justify-center text-white text-xs font-bold uppercase transition-colors">
                     {user.name ? user.name[0] : "U"}
                   </div>
-                  <span className="text-sm font-medium text-slate-200">
+                  <span className="text-sm font-medium text-slate-200 group-hover:text-white transition-colors">
                     {user.name}
                   </span>
-                </div>
+                  <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-1.5 py-0.5 rounded-full font-mono">
+                    Profile
+                  </span>
+                </Link>
                 <button
                   onClick={onLogout}
                   className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-colors"
@@ -129,17 +136,22 @@ export default function Navbar({ user, onLogout }) {
         <div className="md:hidden border-b border-slate-800 bg-slate-900 px-4 pt-2 pb-4 space-y-2">
           {user ? (
             <>
-              <div className="flex items-center space-x-3 pb-3 border-b border-slate-800">
+              <Link
+                to="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center space-x-3 pb-3 border-b border-slate-800 hover:opacity-90"
+              >
                 <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-sm uppercase">
                   {user.name ? user.name[0] : "U"}
                 </div>
-                <div>
+                <div className="flex-1">
                   <div className="text-sm font-semibold text-white">
                     {user.name}
                   </div>
                   <div className="text-xs text-slate-400">{user.email}</div>
                 </div>
-              </div>
+                <span className="text-xs text-indigo-400 font-medium">Profile →</span>
+              </Link>
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const active = isActive(link.path);

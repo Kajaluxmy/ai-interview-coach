@@ -13,6 +13,7 @@ import Interviews from "./pages/Interviews";
 import InterviewRoom from "./pages/InterviewRoom";
 import Reports from "./pages/Reports";
 import InterviewReport from "./pages/InterviewReport";
+import Profile from "./pages/Profile";
 
 function AppRoutes() {
   const { user, logout } = useAuth();
@@ -90,6 +91,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <InterviewReport />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
