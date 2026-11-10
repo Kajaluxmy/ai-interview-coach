@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/client";
+import { useToast } from "../context/ToastContext";
 import {
   FileText,
   UploadCloud,
@@ -16,6 +17,7 @@ import {
 } from "lucide-react";
 
 export default function Resumes() {
+  const { toast } = useToast();
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -69,11 +71,14 @@ export default function Resumes() {
 
       if (res.data?.success) {
         setSuccess("Resume uploaded and parsed successfully!");
+        toast.success("Resume uploaded and parsed successfully!");
         if (fileInputRef.current) fileInputRef.current.value = "";
         fetchResumes();
       }
     } catch (err) {
-      setError(err.message || "Failed to upload resume.");
+      const errMsg = err.message || "Failed to upload resume.";
+      setError(errMsg);
+      toast.error(errMsg);
     } finally {
       setUploading(false);
     }
@@ -87,8 +92,11 @@ export default function Resumes() {
       setResumes((prev) => prev.filter((r) => r._id !== id));
       if (selectedResume?._id === id) setSelectedResume(null);
       setSuccess("Resume deleted successfully.");
+      toast.success("Resume removed from account.");
     } catch (err) {
-      setError(err.message || "Failed to delete resume.");
+      const errMsg = err.message || "Failed to delete resume.";
+      setError(errMsg);
+      toast.error(errMsg);
     }
   };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import api from "../api/client";
 import {
   User,
@@ -17,6 +18,7 @@ import {
 
 export default function Profile() {
   const { user, updateUser } = useAuth();
+  const { toast } = useToast();
 
   // Personal info state
   const [name, setName] = useState(user?.name || "");
@@ -60,12 +62,14 @@ export default function Profile() {
           updateUser({ name: res.data.user.name });
         }
         setProfileSuccess("Profile updated successfully!");
+        toast.success("Profile information updated!");
         setTimeout(() => setProfileSuccess(""), 4000);
       }
     } catch (err) {
-      setProfileError(
-        err.response?.data?.message || err.message || "Failed to update profile."
-      );
+      const errMsg =
+        err.response?.data?.message || err.message || "Failed to update profile.";
+      setProfileError(errMsg);
+      toast.error(errMsg);
     } finally {
       setProfileSaving(false);
     }
@@ -78,13 +82,17 @@ export default function Profile() {
     setPasswordError("");
 
     if (newPassword.length < 6) {
-      setPasswordError("New password must be at least 6 characters.");
+      const msg = "New password must be at least 6 characters.";
+      setPasswordError(msg);
+      toast.error(msg);
       setPasswordSaving(false);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError("New passwords do not match.");
+      const msg = "New passwords do not match.";
+      setPasswordError(msg);
+      toast.error(msg);
       setPasswordSaving(false);
       return;
     }
@@ -97,17 +105,19 @@ export default function Profile() {
 
       if (res.data?.success) {
         setPasswordSuccess("Password changed successfully!");
+        toast.success("Security password changed successfully!");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
         setTimeout(() => setPasswordSuccess(""), 4000);
       }
     } catch (err) {
-      setPasswordError(
+      const errMsg =
         err.response?.data?.message ||
-          err.message ||
-          "Failed to change password."
-      );
+        err.message ||
+        "Failed to change password.";
+      setPasswordError(errMsg);
+      toast.error(errMsg);
     } finally {
       setPasswordSaving(false);
     }
@@ -118,6 +128,7 @@ export default function Profile() {
     localStorage.setItem("ai_coach_pref_role", targetRole);
     localStorage.setItem("ai_coach_pref_difficulty", defaultDifficulty);
     setPrefSaved(true);
+    toast.success("Default interview preferences saved!");
     setTimeout(() => setPrefSaved(false), 3000);
   };
 
