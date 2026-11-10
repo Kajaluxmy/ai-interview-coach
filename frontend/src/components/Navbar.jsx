@@ -11,6 +11,7 @@ import {
   X,
   LogOut,
   User,
+  Zap,
 } from "lucide-react";
 
 export default function Navbar({ user, onLogout }) {
@@ -20,6 +21,7 @@ export default function Navbar({ user, onLogout }) {
   const navLinks = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Mock Interviews", path: "/interviews", icon: PlayCircle },
+    { name: "Question Drills", path: "/drill", icon: Zap },
     { name: "Resumes", path: "/resumes", icon: FileText },
     { name: "Job Matcher", path: "/jobs", icon: Briefcase },
     { name: "Reports", path: "/reports", icon: BarChart3 },

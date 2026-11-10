@@ -15,6 +15,7 @@ import {
   Clock,
   Sparkles,
   Loader2,
+  Zap,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -291,6 +292,17 @@ export default function Dashboard() {
             </h3>
 
             <div className="space-y-2">
+              <Link
+                to="/drill"
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/50 hover:bg-slate-800/60 border border-amber-500/30 transition-colors text-xs text-slate-200 group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Zap className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <span className="font-semibold text-white">Rapid Question Drills</span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400" />
+              </Link>
+
               <Link
                 to="/resumes"
                 className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/50 hover:bg-slate-800/60 border border-slate-800 transition-colors text-xs text-slate-200"

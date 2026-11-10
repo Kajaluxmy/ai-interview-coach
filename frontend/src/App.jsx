@@ -14,6 +14,7 @@ import InterviewRoom from "./pages/InterviewRoom";
 import Reports from "./pages/Reports";
 import InterviewReport from "./pages/InterviewReport";
 import Profile from "./pages/Profile";
+import QuestionDrill from "./pages/QuestionDrill";
 
 function AppRoutes() {
   const { user, logout } = useAuth();
@@ -99,6 +100,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/drill"
+          element={
+            <ProtectedRoute>
+              <QuestionDrill />
             </ProtectedRoute>
           }
         />
