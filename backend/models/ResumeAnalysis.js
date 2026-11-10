@@ -120,6 +120,16 @@ const resumeAnalysisSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+
+    atsScore: {
+      type: Number,
+      default: 70,
+    },
+
+    atsCompatibility: {
+      type: mongoose.Schema.Types.Mixed,
+      default: null,
+    },
   },
   {
     timestamps: true,
